@@ -5,13 +5,16 @@ using UnityEngine;
 public class MoveObjects : MonoBehaviour
 {
     private Vector3 mousePosition;
-    public float targetHeight = 5f; // The height the object will slowly reach
-    public float liftSpeed = 1f;    // The speed of the smooth lift
-    private bool isLifting = false; // Whether the object is lifting or not
-    private float initialYPosition; // Starting Y position of the object
-    private float liftDuration = 0.5f; // How long the lifting takes to reach targetHeight
+    public float targetHeight = 5f; // The height
+    public float liftSpeed = 1f;    // The speed of lift
+    private bool isLifting = false; // The object is lifting or not
+    private float initialYPosition; // Starting Y position
+    private float liftDuration = 0.5f; // How long the lifting takes
 
     private Vector3 initialPosition;
+
+    public Vector3 minBounds; // Minimum boundary
+    public Vector3 maxBounds; // Maximum boundary
 
     private Vector3 GetMousePos()
     {
@@ -20,12 +23,18 @@ public class MoveObjects : MonoBehaviour
 
     private void OnMouseDown()
     {
-        // Capture the initial position when the mouse is clicked
+        // Capture the position when the mouse is clicked
         mousePosition = Input.mousePosition - GetMousePos();
-        initialPosition = transform.position; // Capture the initial object position
+        initialPosition = transform.position; // Capture the object position
         initialYPosition = transform.position.y; // Capture the starting height
 
-        // Start lifting smoothly
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = false;
+        }
+
+        // Start lifting
         if (!isLifting)
         {
             StartCoroutine(LiftObject());
@@ -37,28 +46,27 @@ public class MoveObjects : MonoBehaviour
         // Update the object's position while dragging
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition - mousePosition);
         worldMousePos.y = Mathf.Max(targetHeight, worldMousePos.y); // Ensure we don't go below targetHeight
+
+        worldMousePos.x = Mathf.Clamp(worldMousePos.x, minBounds.x, maxBounds.x);
+        worldMousePos.y = Mathf.Clamp(worldMousePos.y, minBounds.y, maxBounds.y);
+        worldMousePos.z = Mathf.Clamp(worldMousePos.z, minBounds.z, maxBounds.z);
+
         transform.position = worldMousePos;
     }
 
     private void OnMouseUp()
     {
-        // On mouse release, start gravity
+        // Mouse release
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.useGravity = true; // Enable gravity to allow the object to fall
+            rb.useGravity = true; // Enable gravity
         }
-        isLifting = false; // Stop the lifting process
+        isLifting = false; // Stop the lifting
     }
 
     private void Start()
     {
-        // Initially disable gravity for the lifting process
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.useGravity = false; // Disable gravity while lifting
-        }
     }
 
     private IEnumerator LiftObject()
