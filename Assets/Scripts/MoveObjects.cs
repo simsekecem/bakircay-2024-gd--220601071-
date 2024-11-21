@@ -23,10 +23,10 @@ public class MoveObjects : MonoBehaviour
 
     private void OnMouseDown()
     {
-        // Capture the position when the mouse is clicked
+        // Capture the position
         mousePosition = Input.mousePosition - GetMousePos();
-        initialPosition = transform.position; // Capture the object position
-        initialYPosition = transform.position.y; // Capture the starting height
+        initialPosition = transform.position;
+        initialYPosition = transform.position.y;
 
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
@@ -43,9 +43,9 @@ public class MoveObjects : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        // Update the object's position while dragging
+        // Object's position while dragging
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition - mousePosition);
-        worldMousePos.y = Mathf.Max(targetHeight, worldMousePos.y); // Ensure we don't go below targetHeight
+        worldMousePos.y = Mathf.Max(targetHeight, worldMousePos.y); 
 
         worldMousePos.x = Mathf.Clamp(worldMousePos.x, minBounds.x, maxBounds.x);
         worldMousePos.y = Mathf.Clamp(worldMousePos.y, minBounds.y, maxBounds.y);
@@ -74,19 +74,18 @@ public class MoveObjects : MonoBehaviour
         isLifting = true;
         float elapsedTime = 0f;
 
-        // While the elapsed time is less than the lifting duration
         while (elapsedTime < liftDuration)
         {
-            // Smoothly interpolate the Y position
+           
             float newY = Mathf.Lerp(initialYPosition, targetHeight, elapsedTime / liftDuration);
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
 
-            // Increment elapsed time
-            elapsedTime += Time.deltaTime * liftSpeed; // Ensure the lift happens over time
-            yield return null; // Wait for the next frame
+            
+            elapsedTime += Time.deltaTime * liftSpeed;
+            yield return null;
         }
 
-        // Ensure the final position is exactly at the targetHeight
+        // The final position
         transform.position = new Vector3(transform.position.x, targetHeight, transform.position.z);
         isLifting = false;
     }

@@ -13,7 +13,7 @@ public class RandomPlacement : MonoBehaviour
 
         foreach (GameObject nesne in objects)
         {
-            nesne.transform.position = new Vector3(Random.Range(-2f, 2f), 5f, Random.Range(-3f, 4f));
+            nesne.transform.position = new Vector3(Random.Range(-3f, 3f), 5f, Random.Range(-2.3f, 4.3f));
         }
     }
 }
