@@ -1,4 +1,4 @@
-#### Collection Game
+# Collection Game
 
 This Unity project is a simple 3D game. The player can move fruits and vegetables and collect them into a storage tray.
 
