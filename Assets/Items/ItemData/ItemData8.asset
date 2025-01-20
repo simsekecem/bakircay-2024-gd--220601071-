@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fb5a4565d9f90049a20eee6a955a3e4, type: 3}
-  m_Name: ItemData0
+  m_Name: ItemData8
   m_EditorClassIdentifier: 
-  itemName: Tomato
-  itemPrefab: {fileID: 647030164874827275, guid: 60f39d8c2fd0bb44dbb67dad83d83401,
+  itemName: Soda
+  itemPrefab: {fileID: 7625404034505376457, guid: 67973addc20c585459f9beb205d3ff66,
     type: 3}
-  itemScore: 150
+  itemScore: 200

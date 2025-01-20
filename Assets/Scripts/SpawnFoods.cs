@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SpawnFoods : MonoBehaviour
@@ -7,39 +8,26 @@ public class SpawnFoods : MonoBehaviour
     public ItemRepository itemRepository;
     [Range(1, 8)] public int spawnCount = 8;
     public Vector3 spawnArea = new Vector3(5, 1, 5);
-    [Range(1, 10)] public float spawnDistance = 1.7f;
-
+    private const float spawnDistance = 1f;
     public List<Transform> spawnedObjects = new List<Transform>();
 
-    public int CurrentItemCount => spawnedObjects.Count(x => x.gameObject.activeSelf);
-    public int SpawnedItemCount => spawnCount * 2;
-
-    public List<Item> GetItems()
+    private void Start()
     {
-        return spawnedObjects.Where(x => x != null && x.gameObject.activeSelf).Select(x => x.GetComponent<Item>())
-            .ToList();
-    }
-
-    private void Update()
-    {
-        if (spawnedObjects.Count == 0)
-            return;
-
-        if (spawnedObjects.All(x => x.gameObject.activeSelf == false))
-        {
-            Debug.Log("All objects are inactive");
-            SpawnObjects();
-        }
+        SpawnObjects();
     }
 
     [ContextMenu("Spawn Objects")]
-    public void SpawnObjects()
+    private void SpawnObjects()
     {
-        const int pairCount = 2;
-        ClearSpawnedObjects();
+        // Clear previously spawned objects
+        spawnedObjects.ForEach(x => Destroy(x.gameObject));
+        spawnedObjects.Clear();
 
-        var itemData = itemRepository.GetRandomItems(spawnCount);
-        if (itemData.Count == 0)
+        int maxTries = 100; // Maximum number of tries for finding a valid position
+        int currentTryCount = 0;
+
+        var itemDatas = itemRepository.GetRandomItems(spawnCount);
+        if (itemDatas.Count == 0)
         {
             Debug.LogError("No items in the repository");
             return;
@@ -47,67 +35,84 @@ public class SpawnFoods : MonoBehaviour
 
         for (int i = 0; i < spawnCount; i++)
         {
-            for (int j = 0; j < pairCount; j++)
+            Vector3 firstSpawnPosition;
+            Vector3 secondSpawnPosition;
+            bool validFirstPositionFound = false;
+            bool validSecondPositionFound = false;
+
+            // Find a valid position for the first object
+            do
             {
-                Vector3 spawnPosition = GetValidSpawnPosition();
+                firstSpawnPosition = GetRandomPos();
+                currentTryCount++;
 
-                var itemPrefab = itemData[i].itemPrefab;
+                if (!spawnedObjects.Any(x => Vector3.Distance(x.position, firstSpawnPosition) < spawnDistance))
+                {
+                    validFirstPositionFound = true;
+                }
+                else if (currentTryCount > maxTries)
+                {
+                    Debug.LogWarning("Max tries reached for spawning the first object.");
+                    break;
+                }
 
-                var instance = Instantiate(itemPrefab, spawnPosition, Quaternion.identity);
+            } while (!validFirstPositionFound);
 
-                var item = instance.GetComponent<Item>();
-                item.itemData = itemData[i];
-                item.matchID = i;
+            if (!validFirstPositionFound)
+                continue;
 
-                spawnedObjects.Add(instance.transform);
-            }
+            currentTryCount = 0;
+
+            // Find a valid position for the second object
+            do
+            {
+                secondSpawnPosition = GetRandomPos();
+                currentTryCount++;
+
+                if (!spawnedObjects.Any(x => Vector3.Distance(x.position, secondSpawnPosition) < spawnDistance))
+                {
+                    validSecondPositionFound = true;
+                }
+                else if (currentTryCount > maxTries)
+                {
+                    Debug.LogWarning("Max tries reached for spawning the second object.");
+                    break;
+                }
+
+            } while (!validSecondPositionFound);
+
+            if (!validSecondPositionFound)
+                continue;
+
+            currentTryCount = 0;
+
+            // Spawn the objects
+            var itemPrefab = itemDatas[i].itemPrefab;
+
+            var firstInstance = Instantiate(itemPrefab, firstSpawnPosition, Quaternion.identity);
+            var secondInstance = Instantiate(itemPrefab, secondSpawnPosition, Quaternion.identity);
+
+            firstInstance.GetComponent<Item>().matchID = i;
+            secondInstance.GetComponent<Item>().matchID = i;
+
+            spawnedObjects.Add(firstInstance.transform);
+            spawnedObjects.Add(secondInstance.transform);
         }
-
-        GameEvents.OnItemsSpawned?.Invoke();
-    }
-
-    private void ClearSpawnedObjects()
-    {
-        const float delay = 2f;
-        spawnedObjects.ForEach(x => Destroy(x.gameObject, delay));
-        spawnedObjects.Clear();
-    }
-
-    private Vector3 GetValidSpawnPosition()
-    {
-        Vector3 spawnPosition;
-        const int maxTries = 100;
-        int currentTryCount = 0;
-        bool isValid = false;
-        do
-        {
-            spawnPosition = transform.position + GetRandomPos();
-            currentTryCount++;
-            isValid = !spawnedObjects.Any(x => Vector3.Distance(x.position, spawnPosition) < spawnDistance);
-        } while (!isValid && currentTryCount <= maxTries);
-
-        if (currentTryCount > maxTries)
-        {
-            Debug.LogWarning("Max tries reached");
-        }
-
-        return spawnPosition;
     }
 
     private Vector3 GetRandomPos()
     {
+        // Generate a random position within the spawn area
         return new Vector3(
             UnityEngine.Random.Range(-spawnArea.x * 0.5f, spawnArea.x * 0.5f),
             UnityEngine.Random.Range(-spawnArea.y * 0.5f, spawnArea.y * 0.5f),
             UnityEngine.Random.Range(-spawnArea.z * 0.5f, spawnArea.z * 0.5f)
-        );
+        ) + transform.position;
     }
-
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(transform.position, spawnArea);
     }
-}
 }
