@@ -16,11 +16,24 @@ public class SpawnFoods : MonoBehaviour
         SpawnObjects();
     }
 
+    private void Update()
+    {
+        // Eðer sahnede "Moveable" tagýna sahip nesne kalmadýysa yeniden spawn yap
+        if (!GameObject.FindGameObjectsWithTag("Moveable").Any())
+        {
+            SpawnObjects();
+        }
+    }
+
     [ContextMenu("Spawn Objects")]
     private void SpawnObjects()
     {
         // Clear previously spawned objects
-        spawnedObjects.ForEach(x => Destroy(x.gameObject));
+        spawnedObjects.ForEach(x =>
+        {
+            if (x != null)
+                Destroy(x.gameObject);
+        });
         spawnedObjects.Clear();
 
         int maxTries = 100; // Maximum number of tries for finding a valid position
@@ -46,7 +59,7 @@ public class SpawnFoods : MonoBehaviour
                 firstSpawnPosition = GetRandomPos();
                 currentTryCount++;
 
-                if (!spawnedObjects.Any(x => Vector3.Distance(x.position, firstSpawnPosition) < spawnDistance))
+                if (!spawnedObjects.Any(x => x != null && Vector3.Distance(x.position, firstSpawnPosition) < spawnDistance))
                 {
                     validFirstPositionFound = true;
                 }
@@ -69,7 +82,7 @@ public class SpawnFoods : MonoBehaviour
                 secondSpawnPosition = GetRandomPos();
                 currentTryCount++;
 
-                if (!spawnedObjects.Any(x => Vector3.Distance(x.position, secondSpawnPosition) < spawnDistance))
+                if (!spawnedObjects.Any(x => x != null && Vector3.Distance(x.position, secondSpawnPosition) < spawnDistance))
                 {
                     validSecondPositionFound = true;
                 }
