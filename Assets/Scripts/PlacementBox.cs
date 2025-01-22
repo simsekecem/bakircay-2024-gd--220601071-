@@ -1,16 +1,20 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacementBox : MonoBehaviour
 {
     public GameObject currentObject;
+    public Animator lidAnimator; // Animator referansý, Inspector'da atanmalý.
 
     [SerializeField] private Transform _leftObjectPlacement;
     [SerializeField] private Transform _rightObjectPlacement;
 
     private readonly string objectTag = "Moveable";
     private Coroutine matchCoroutine;
+
+    // Lid'in açýk veya kapalý durumunu kontrol eden deðiþkenler
+    private bool isLidOpen = false; // Lid baþlangýçta kapalý
+    private bool isLidAnimating = false; // Animasyon oynarken baþka bir tetikleme engellenir
 
     private void OnTriggerEnter(Collider other)
     {
@@ -57,6 +61,15 @@ public class PlacementBox : MonoBehaviour
         currentItem.SetCollidersActive(false);
         otherItem.SetCollidersActive(false);
 
+        // Lid Open animasyonu bir kez çalýþtýrýlýr
+        if (!isLidOpen && !isLidAnimating)
+        {
+            isLidAnimating = true;
+            lidAnimator.SetTrigger("LidOpen");
+            yield return new WaitForSeconds(1f); // Animasyon süresince bekleme
+            isLidOpen = true;
+            isLidAnimating = false;
+        }
 
         otherItem.transform.position = _rightObjectPlacement.position;
         otherItem.transform.rotation = _rightObjectPlacement.rotation;
@@ -80,6 +93,16 @@ public class PlacementBox : MonoBehaviour
         {
             currentItem.gameObject.SetActive(false);
             otherItem.gameObject.SetActive(false);
+
+            // Lid Close animasyonu bir kez çalýþtýrýlýr
+            if (isLidOpen && !isLidAnimating)
+            {
+                isLidAnimating = true;
+                lidAnimator.SetTrigger("LidClose");
+                yield return new WaitForSeconds(1f); // Animasyon süresince bekleme
+                isLidOpen = false;
+                isLidAnimating = false;
+            }
         }
 
         currentObject = null;
@@ -90,6 +113,7 @@ public class PlacementBox : MonoBehaviour
     {
         if (other.attachedRigidbody == null || other.attachedRigidbody.CompareTag(objectTag) == false)
             return;
+
         if (other.attachedRigidbody.gameObject == currentObject)
         {
             currentObject = null;
