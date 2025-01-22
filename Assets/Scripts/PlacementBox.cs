@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class PlacementBox : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class PlacementBox : MonoBehaviour
     [SerializeField] private Transform _leftObjectPlacement;
     [SerializeField] private Transform _rightObjectPlacement;
     [SerializeField] private ScoreManager scoreManager;
+    public Button autoMatchButton;
 
     private readonly string objectTag = "Moveable";
     private Coroutine matchCoroutine;
@@ -28,6 +31,11 @@ public class PlacementBox : MonoBehaviour
         if (currentObject == null)
         {
             SetCurrentObject(other);
+
+            if (autoMatchButton != null)
+            {
+                autoMatchButton.interactable = false;
+            }
         }
         else
         {
@@ -38,7 +46,7 @@ public class PlacementBox : MonoBehaviour
         }
     }
 
-    private bool CheckMatch(Collider other)
+    public bool CheckMatch(Collider other)
     {
         if (matchCoroutine != null)
         {
@@ -129,6 +137,11 @@ public class PlacementBox : MonoBehaviour
         if (other.attachedRigidbody.gameObject == currentObject)
         {
             currentObject = null;
+
+            if (autoMatchButton != null)
+            {
+                autoMatchButton.interactable = true;
+            }
         }
     }
 

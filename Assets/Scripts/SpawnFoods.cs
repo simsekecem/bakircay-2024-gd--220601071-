@@ -10,6 +10,7 @@ public class SpawnFoods : MonoBehaviour
     public Vector3 spawnArea = new Vector3(5, 1, 5);
     private const float spawnDistance = 1f;
     public List<Transform> spawnedObjects = new List<Transform>();
+    public AutoMatchManager autoMatchManager; // AutoMatchManager referansý
 
     private void Start()
     {
@@ -35,6 +36,12 @@ public class SpawnFoods : MonoBehaviour
                 Destroy(x.gameObject);
         });
         spawnedObjects.Clear();
+
+        // AutoMatchManager'ýn items listesini temizle
+        if (autoMatchManager != null)
+        {
+            autoMatchManager.items.Clear();
+        }
 
         int maxTries = 100; // Maximum number of tries for finding a valid position
         int currentTryCount = 0;
@@ -110,6 +117,13 @@ public class SpawnFoods : MonoBehaviour
 
             spawnedObjects.Add(firstInstance.transform);
             spawnedObjects.Add(secondInstance.transform);
+
+            // AutoMatchManager'ýn items listesine ekle
+            if (autoMatchManager != null)
+            {
+                autoMatchManager.items.Add(firstInstance);
+                autoMatchManager.items.Add(secondInstance);
+            }
         }
     }
 
