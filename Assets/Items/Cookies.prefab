@@ -129,7 +129,7 @@ MonoBehaviour:
   selfRigidbody: {fileID: 0}
   isDragged: 0
   isPlaced: 0
-  itemData: {fileID: 0}
+  itemData: {fileID: 11400000, guid: 6cae6b9ae7d21e94295f5f7d824f88de, type: 2}
   spawnWidth: 10
   spawnDepth: 10
 --- !u!64 &-2864870424010819604

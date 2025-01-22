@@ -8,6 +8,7 @@ public class PlacementBox : MonoBehaviour
 
     [SerializeField] private Transform _leftObjectPlacement;
     [SerializeField] private Transform _rightObjectPlacement;
+    [SerializeField] private ScoreManager scoreManager;
 
     private readonly string objectTag = "Moveable";
     private Coroutine matchCoroutine;
@@ -91,6 +92,17 @@ public class PlacementBox : MonoBehaviour
 
         if (currentItem != null && otherItem != null)
         {
+
+            if (currentItem.itemData != null)
+            {
+                Debug.Log("CurrentItem Score: " + currentItem.itemData.itemScore);
+                scoreManager.UpdateScore(currentItem.itemData.itemScore);
+            }
+            else
+            {
+                Debug.Log("Item data is null!");
+            }
+
             currentItem.gameObject.SetActive(false);
             otherItem.gameObject.SetActive(false);
 

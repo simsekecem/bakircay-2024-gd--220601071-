@@ -11,17 +11,17 @@ public struct TouchData
     public Vector2 deltaPosition;
 }
 
-public class Touch : MonoBehaviour
+public class TouchManager : MonoBehaviour
 {
-    private static Touch _instance;
+    private static TouchManager _instance;
 
-    public static Touch Instance
+    public static TouchManager Instance
     {
         get
         {
             if (_instance == null)
             {
-                _instance = FindObjectOfType<Touch>();
+                _instance = FindObjectOfType<TouchManager>();
             }
 
             if (_instance == null)

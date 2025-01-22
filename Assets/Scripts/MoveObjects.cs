@@ -19,7 +19,7 @@ public class MoveObjects : MonoBehaviour
 
     void Start()
     {
-        if (Touch.Instance == null)
+        if (TouchManager.Instance == null)
         {
             enabled = false;
             return;
@@ -27,18 +27,18 @@ public class MoveObjects : MonoBehaviour
 
         _dragPlane = new Plane(Vector3.up, new Vector3(0, _verticalOffset, 0));
 
-        Touch.Instance.OnTouchBegan += TouchBegan;
-        Touch.Instance.OnTouchMoved += TouchMoved;
-        Touch.Instance.OnTouchEnded += TouchEnded;
+        TouchManager.Instance.OnTouchBegan += TouchBegan;
+        TouchManager.Instance.OnTouchMoved += TouchMoved;
+        TouchManager.Instance.OnTouchEnded += TouchEnded;
     }
 
     private void OnDestroy()
     {
-        if (!Touch.Instance)
+        if (!TouchManager.Instance)
             return;
-        Touch.Instance.OnTouchBegan -= TouchBegan;
-        Touch.Instance.OnTouchMoved -= TouchMoved;
-        Touch.Instance.OnTouchEnded -= TouchEnded;
+        TouchManager.Instance.OnTouchBegan -= TouchBegan;
+        TouchManager.Instance.OnTouchMoved -= TouchMoved;
+        TouchManager.Instance.OnTouchEnded -= TouchEnded;
     }
 
     private void TouchBegan(TouchData touchData)
