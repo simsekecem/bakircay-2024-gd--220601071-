@@ -1,25 +1,47 @@
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public TextMeshProUGUI scoreText; // Skoru gösterecek TextMeshPro öðesi
+    public TextMeshProUGUI scoreText;
     private int currentScore = 0;
+    private int scoreMultiplier = 1;
+    private bool isDoubleScoreActive = false;
 
-    // Skoru güncelleme metodu
     public void UpdateScore(int amount)
     {
-        currentScore += amount;
+        currentScore += amount * scoreMultiplier;
         scoreText.text = $"Score: {currentScore}";
     }
 
-    // Skoru sýfýrlama metodu
     public void ResetScore()
     {
         currentScore = 0;
+        scoreMultiplier = 1;
         scoreText.text = $"Score: {currentScore}";
     }
-}
 
+    public void SetScoreMultiplier(int multiplier)
+    {
+        scoreMultiplier = multiplier;
+    }
+
+    public void ActivateDoubleScore()
+    {
+        if (!isDoubleScoreActive)
+        {
+            isDoubleScoreActive = true;
+            SetScoreMultiplier(2);
+        }
+    }
+
+    public void DeactivateDoubleScore()
+    {
+        if (isDoubleScoreActive)
+        {
+            isDoubleScoreActive = false;
+            SetScoreMultiplier(1);
+        }
+    }
+}

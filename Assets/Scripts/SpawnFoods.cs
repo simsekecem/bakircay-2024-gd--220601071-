@@ -1,16 +1,19 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class SpawnFoods : MonoBehaviour
 {
+    public event Action OnObjectsSpawned; 
+
     public ItemRepository itemRepository;
+    public ScoreManager scoreManager;
     [Range(1, 8)] public int spawnCount = 8;
     public Vector3 spawnArea = new Vector3(5, 1, 5);
     private const float spawnDistance = 1f;
     public List<Transform> spawnedObjects = new List<Transform>();
-    public AutoMatchManager autoMatchManager; // AutoMatchManager referansý
+    public AutoMatchManager autoMatchManager;
 
     private void Start()
     {
@@ -19,7 +22,6 @@ public class SpawnFoods : MonoBehaviour
 
     private void Update()
     {
-        // Eðer sahnede "Moveable" tagýna sahip nesne kalmadýysa yeniden spawn yap
         if (!GameObject.FindGameObjectsWithTag("Moveable").Any())
         {
             SpawnObjects();
@@ -29,7 +31,6 @@ public class SpawnFoods : MonoBehaviour
     [ContextMenu("Spawn Objects")]
     private void SpawnObjects()
     {
-        // Clear previously spawned objects
         spawnedObjects.ForEach(x =>
         {
             if (x != null)
@@ -37,13 +38,12 @@ public class SpawnFoods : MonoBehaviour
         });
         spawnedObjects.Clear();
 
-        // AutoMatchManager'ýn items listesini temizle
         if (autoMatchManager != null)
         {
             autoMatchManager.items.Clear();
         }
 
-        int maxTries = 100; // Maximum number of tries for finding a valid position
+        int maxTries = 100;
         int currentTryCount = 0;
 
         var itemDatas = itemRepository.GetRandomItems(spawnCount);
@@ -60,7 +60,6 @@ public class SpawnFoods : MonoBehaviour
             bool validFirstPositionFound = false;
             bool validSecondPositionFound = false;
 
-            // Find a valid position for the first object
             do
             {
                 firstSpawnPosition = GetRandomPos();
@@ -83,7 +82,6 @@ public class SpawnFoods : MonoBehaviour
 
             currentTryCount = 0;
 
-            // Find a valid position for the second object
             do
             {
                 secondSpawnPosition = GetRandomPos();
@@ -106,7 +104,6 @@ public class SpawnFoods : MonoBehaviour
 
             currentTryCount = 0;
 
-            // Spawn the objects
             var itemPrefab = itemDatas[i].itemPrefab;
 
             var firstInstance = Instantiate(itemPrefab, firstSpawnPosition, Quaternion.identity);
@@ -118,20 +115,26 @@ public class SpawnFoods : MonoBehaviour
             spawnedObjects.Add(firstInstance.transform);
             spawnedObjects.Add(secondInstance.transform);
 
-            // AutoMatchManager'ýn items listesine ekle
             if (autoMatchManager != null)
             {
                 autoMatchManager.items.Add(firstInstance);
                 autoMatchManager.items.Add(secondInstance);
             }
         }
+
+
+        if (scoreManager != null)
+        {
+            scoreManager.DeactivateDoubleScore();
+        }
+
+        OnObjectsSpawned?.Invoke();
     }
 
     private Vector3 GetRandomPos()
     {
-        // Generate a random position within the spawn area
         return new Vector3(
-            UnityEngine.Random.Range(-spawnArea.x * 0.5f, spawnArea.x * 0.5f),
+            UnityEngine.Random.Range(-spawnArea.x * 0.5f, spawnArea.x * 0.5f), 
             UnityEngine.Random.Range(-spawnArea.y * 0.5f, spawnArea.y * 0.5f),
             UnityEngine.Random.Range(-spawnArea.z * 0.5f, spawnArea.z * 0.5f)
         ) + transform.position;
