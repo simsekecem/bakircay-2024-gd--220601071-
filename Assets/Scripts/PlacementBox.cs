@@ -6,7 +6,7 @@ using DG.Tweening;
 public class PlacementBox : MonoBehaviour
 {
     public GameObject currentObject;
-    public Animator lidAnimator; // Animator referansý, Inspector'da atanmalý.
+    public Animator lidAnimator;
 
     [SerializeField] private Transform _leftObjectPlacement;
     [SerializeField] private Transform _rightObjectPlacement;
@@ -17,9 +17,8 @@ public class PlacementBox : MonoBehaviour
     private readonly string objectTag = "Moveable";
     private Coroutine matchCoroutine;
 
-    // Lid'in açýk veya kapalý durumunu kontrol eden deðiþkenler
-    private bool isLidOpen = false; // Lid baþlangýçta kapalý
-    private bool isLidAnimating = false; // Animasyon oynarken baþka bir tetikleme engellenir
+    private bool isLidOpen = false;
+    private bool isLidAnimating = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -38,10 +37,7 @@ public class PlacementBox : MonoBehaviour
                 autoMatchButton.interactable = false;
             }
 
-            if (shuffleButton != null)
-            {
-                shuffleButton.interactable = false;
-            }
+            UpdateShuffleButtonInteractable();
         }
         else
         {
@@ -65,6 +61,13 @@ public class PlacementBox : MonoBehaviour
             return false;
 
         other.attachedRigidbody.isKinematic = true;
+
+        // Eþleþme baþlar baþlamaz Shuffle butonunu devre dýþý býrak
+        if (shuffleButton != null)
+        {
+            shuffleButton.interactable = false;
+        }
+
         matchCoroutine = StartCoroutine(MatchCoroutine(otherItem));
         return true;
     }
@@ -76,52 +79,44 @@ public class PlacementBox : MonoBehaviour
         currentItem.SetCollidersActive(false);
         otherItem.SetCollidersActive(false);
 
-        // Sað ve sol yerleþtirme hareketleri
         otherItem.transform.DOMove(_rightObjectPlacement.position, 0.5f);
         otherItem.transform.DORotateQuaternion(_rightObjectPlacement.rotation, 0.5f);
 
         currentItem.transform.DOMove(_leftObjectPlacement.position, 0.5f);
         currentItem.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
 
-        // Yerleþtirme iþlemi tamamlanana kadar bekleyin
         yield return new WaitForSeconds(0.5f);
 
-        // Kapak animasyonu (nesneler yerleþtikten sonra)
         if (!isLidOpen && !isLidAnimating)
         {
             isLidAnimating = true;
 
-            // Kapak açýlma sesini çal
             AudioManager.Instance.PlaySound(AudioManager.Instance.lidOpenSound);
 
             lidAnimator.SetTrigger("LidOpen");
-            yield return new WaitForSeconds(1f); // Animasyonun süresi kadar bekleyin
+            yield return new WaitForSeconds(1f);
             isLidOpen = true;
             isLidAnimating = false;
+
+            UpdateShuffleButtonInteractable(); // Shuffle durumu güncellenir
         }
 
-        // Ortada birleþme hareketi
         Vector3 targetPos = (currentItem.transform.position + otherItem.transform.position) / 2f;
         currentItem.transform.DOMove(targetPos, 1f);
         otherItem.transform.DOMove(targetPos, 1f);
         yield return new WaitForSeconds(1f);
 
-        
-
-        // Efekt oynat
         PlayBurnEffect(currentItem.gameObject);
         PlayBurnEffect(otherItem.gameObject);
         yield return new WaitForSeconds(3f);
 
-        // Aþaðýya kayma hareketi
         targetPos += Vector3.down * 5f;
         currentItem.transform.DOMove(targetPos, 1f);
         otherItem.transform.DOMove(targetPos, 1f);
         yield return new WaitForSeconds(1f);
-        // Eþleþme sesini çal
+
         AudioManager.Instance.PlaySound(AudioManager.Instance.matchSound);
 
-        // Nesneleri kapat ve skoru güncelle
         if (currentItem != null && otherItem != null)
         {
             Debug.Log("CurrentItem Score: " + currentItem.itemData.itemScore);
@@ -130,26 +125,27 @@ public class PlacementBox : MonoBehaviour
             currentItem.gameObject.SetActive(false);
             otherItem.gameObject.SetActive(false);
 
-            // Kapak kapatma animasyonu
             if (isLidOpen && !isLidAnimating)
             {
                 isLidAnimating = true;
 
-                // Kapak kapanma sesini çal
                 AudioManager.Instance.PlaySound(AudioManager.Instance.lidCloseSound);
 
                 lidAnimator.SetTrigger("LidClose");
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(1f); // Kapak kapanma süresini bekle
                 isLidOpen = false;
                 isLidAnimating = false;
+
+                UpdateShuffleButtonInteractable(); // Kapak kapandýktan sonra buton durumu güncelle
             }
             currentObject = null;
             matchCoroutine = null;
-        }
 
-        if (shuffleButton != null)
-        {
-            shuffleButton.interactable = true;
+            // Eþleþme tamamlandýðýnda Shuffle butonunu tekrar aktif hale getir
+            if (shuffleButton != null)
+            {
+                shuffleButton.interactable = true;
+            }
         }
 
         yield return new WaitForSeconds(5f);
@@ -176,11 +172,7 @@ public class PlacementBox : MonoBehaviour
         currentObject.transform.DOMove(_leftObjectPlacement.position, 0.5f);
         currentObject.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
 
-        // Shuffle butonunu devre dýþý býrak
-        if (shuffleButton != null)
-        {
-            shuffleButton.interactable = false;
-        }
+        UpdateShuffleButtonInteractable(); // Shuffle durumu güncellenir
     }
 
     private void OnTriggerExit(Collider other)
@@ -197,10 +189,22 @@ public class PlacementBox : MonoBehaviour
                 autoMatchButton.interactable = true;
             }
 
-            if (shuffleButton != null)
-            {
-                shuffleButton.interactable = true; // Shuffle butonunu tekrar aktif et
-            }
+            UpdateShuffleButtonInteractable(); // Shuffle durumu güncellenir
         }
+    }
+
+    private void UpdateShuffleButtonInteractable()
+    {
+        if (shuffleButton != null)
+        {
+            shuffleButton.interactable = !isLidOpen && !isLidAnimating && matchCoroutine == null; // Eþleþme iþlemi yapýlmýyorsa aktif
+        }
+    }
+
+    public void OnLidClosed() // Animator Event için metod
+    {
+        isLidOpen = false;
+        isLidAnimating = false;
+        UpdateShuffleButtonInteractable();
     }
 }

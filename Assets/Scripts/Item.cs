@@ -40,7 +40,7 @@ public class Item : MonoBehaviour
         if (isPlaced || isDragged)
             return;
 
-        if (transform.position.y < -10 && !selfRigidbody.isKinematic)
+        if (transform.position.y < -20 && !selfRigidbody.isKinematic)
         {
             Debug.Log($"Re-positioning object: {gameObject.name}");
             RePositionObject();
