@@ -1511,7 +1511,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 13, y: 1, z: 20}
+  m_LocalScale: {x: 13, y: 10, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2960,7 +2960,7 @@ Transform:
   m_GameObject: {fileID: 1421267224}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1, y: 24.9, z: -9.4}
+  m_LocalPosition: {x: 1.1, y: 24.9, z: -7.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2982,7 +2982,7 @@ MonoBehaviour:
   raycastLayer:
     serializedVersion: 2
     m_Bits: 8
-  dragBorder: {x: 100, y: 50, z: 170}
+  dragBorder: {x: 100, y: 50, z: 157.1}
   _targetPosition: {x: 0, y: 0, z: 0}
   _additionalHeight: 20
 --- !u!1 &1434157206

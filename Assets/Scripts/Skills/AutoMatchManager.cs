@@ -98,7 +98,7 @@ public class AutoMatchManager : MonoBehaviour
     // Buton kilidini belirli bir süre sonra aç
     private IEnumerator UnlockButtonAfterDelay()
     {
-        yield return new WaitForSeconds(1f); 
+        yield return new WaitForSeconds(10f); 
         isButtonLocked = false;
     }
 }
