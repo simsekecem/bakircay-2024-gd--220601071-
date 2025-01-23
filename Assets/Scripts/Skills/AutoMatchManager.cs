@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class AutoMatchManager : MonoBehaviour
 {
@@ -12,12 +13,12 @@ public class AutoMatchManager : MonoBehaviour
     public PlacementBox placementBox;
 
     private bool isMatchingInProgress = false; 
-    private bool isButtonLocked = false; // Týklama kilidi
+    private bool isButtonLocked = false; 
 
 
     public void OnAutoMatchButtonClicked()
     {
-        // Eðer buton zaten kilitliyse veya PlacementBox doluysa iþlem yapma
+        
         if (isButtonLocked || (placementBox != null && placementBox.currentObject != null))
         {
             Debug.LogWarning("Button is locked or PlacementBox is not empty.");
@@ -79,12 +80,12 @@ public class AutoMatchManager : MonoBehaviour
 
     private void PlaceItems(GameObject[] matchedItems)
     {
-        // Eþleþen nesneleri uygun pozisyonlara taþý
-        matchedItems[0].transform.position = leftPlace.position;
-        matchedItems[0].transform.rotation = leftPlace.rotation;
+     
+        matchedItems[0].transform.DOMove(leftPlace.position, 0.5f).SetEase(Ease.InOutQuad);
+        matchedItems[0].transform.DORotateQuaternion(leftPlace.rotation, 0.5f).SetEase(Ease.InOutQuad);
 
-        matchedItems[1].transform.position = rightPlace.position;
-        matchedItems[1].transform.rotation = rightPlace.rotation;
+        matchedItems[1].transform.DOMove(rightPlace.position, 0.5f).SetEase(Ease.InOutQuad);
+        matchedItems[1].transform.DORotateQuaternion(rightPlace.rotation, 0.5f).SetEase(Ease.InOutQuad);
     }
 
     private IEnumerator ResetAutoMatchButton()

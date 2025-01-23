@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 
 public class PlacementBox : MonoBehaviour
@@ -12,6 +13,7 @@ public class PlacementBox : MonoBehaviour
     [SerializeField] private Transform _rightObjectPlacement;
     [SerializeField] private ScoreManager scoreManager;
     public Button autoMatchButton;
+    public Button shuffleButton;
 
     private readonly string objectTag = "Moveable";
     private Coroutine matchCoroutine;
@@ -35,6 +37,11 @@ public class PlacementBox : MonoBehaviour
             if (autoMatchButton != null)
             {
                 autoMatchButton.interactable = false;
+            }
+
+            if (shuffleButton != null)
+            {
+                shuffleButton.interactable = false;
             }
         }
         else
@@ -70,65 +77,58 @@ public class PlacementBox : MonoBehaviour
         currentItem.SetCollidersActive(false);
         otherItem.SetCollidersActive(false);
 
-        // Lid Open animasyonu bir kez çalýþtýrýlýr
+        // Sað ve sol yerleþtirme hareketleri
+        otherItem.transform.DOMove(_rightObjectPlacement.position, 0.5f);
+        otherItem.transform.DORotateQuaternion(_rightObjectPlacement.rotation, 0.5f);
+
+        currentItem.transform.DOMove(_leftObjectPlacement.position, 0.5f);
+        currentItem.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
+
+        // Yerleþtirme iþlemi tamamlanana kadar bekleyin
+        yield return new WaitForSeconds(0.5f);
+
+        // Kapak animasyonu (nesneler yerleþtikten sonra)
         if (!isLidOpen && !isLidAnimating)
         {
             isLidAnimating = true;
             lidAnimator.SetTrigger("LidOpen");
-            yield return new WaitForSeconds(1f); // Animasyon süresince bekleme
+            yield return new WaitForSeconds(1f); // Animasyonun süresi kadar bekleyin
             isLidOpen = true;
             isLidAnimating = false;
         }
 
-        otherItem.transform.position = _rightObjectPlacement.position;
-        otherItem.transform.rotation = _rightObjectPlacement.rotation;
-
+        // Ortada birleþme hareketi
+        Vector3 targetPos = (currentItem.transform.position + otherItem.transform.position) / 2f;
+        currentItem.transform.DOMove(targetPos, 1f);
+        otherItem.transform.DOMove(targetPos, 1f);
         yield return new WaitForSeconds(1f);
 
-        Vector3 targetPos = (currentItem.transform.position + otherItem.transform.position) / 2f;
-
-       
-
-        currentItem.transform.position = targetPos;
-        otherItem.transform.position = targetPos;
+        // Efekt oynat
         PlayBurnEffect(currentItem.gameObject);
         PlayBurnEffect(otherItem.gameObject);
-
-        // Efektin bitmesini bekleyin
         yield return new WaitForSeconds(3f);
 
-        targetPos += Vector3.down * 2f;
-        currentItem.transform.position = targetPos;
-        otherItem.transform.position = targetPos;
-
+        // Aþaðýya kayma hareketi
+        targetPos += Vector3.down * 5f;
+        currentItem.transform.DOMove(targetPos, 1f);
+        otherItem.transform.DOMove(targetPos, 1f);
         yield return new WaitForSeconds(1f);
 
+        // Nesneleri kapat ve skoru güncelle
         if (currentItem != null && otherItem != null)
         {
-
-            if (currentItem.itemData != null)
-            {
-                Debug.Log("CurrentItem Score: " + currentItem.itemData.itemScore);
-                scoreManager.UpdateScore(currentItem.itemData.itemScore);
-            }
-            else
-            {
-                Debug.Log("Item data is null!");
-            }
-
-            
-
+            Debug.Log("CurrentItem Score: " + currentItem.itemData.itemScore);
+            scoreManager.UpdateScore(currentItem.itemData.itemScore);
 
             currentItem.gameObject.SetActive(false);
             otherItem.gameObject.SetActive(false);
 
-  
-            // Lid Close animasyonu bir kez çalýþtýrýlýr
+            // Kapak kapatma animasyonu
             if (isLidOpen && !isLidAnimating)
             {
                 isLidAnimating = true;
                 lidAnimator.SetTrigger("LidClose");
-                yield return new WaitForSeconds(1f); // Animasyon süresince bekleme
+                yield return new WaitForSeconds(1f);
                 isLidOpen = false;
                 isLidAnimating = false;
             }
@@ -136,6 +136,10 @@ public class PlacementBox : MonoBehaviour
             matchCoroutine = null;
         }
 
+        if (shuffleButton != null)
+        {
+            shuffleButton.interactable = true;
+        }
 
         yield return new WaitForSeconds(5f);
         if (autoMatchButton != null)
@@ -143,8 +147,9 @@ public class PlacementBox : MonoBehaviour
             autoMatchButton.interactable = true;
         }
 
-
+        
     }
+
 
     private void PlayBurnEffect(GameObject targetObject)
     {
@@ -168,6 +173,11 @@ public class PlacementBox : MonoBehaviour
             {
                 autoMatchButton.interactable = true;
             }
+
+            if (shuffleButton != null)
+            {
+                shuffleButton.interactable = true;
+            }
         }
     }
 
@@ -176,7 +186,7 @@ public class PlacementBox : MonoBehaviour
         other.attachedRigidbody.isKinematic = true;
         currentObject = other.attachedRigidbody.gameObject;
 
-        currentObject.transform.position = _leftObjectPlacement.position;
-        currentObject.transform.rotation = _leftObjectPlacement.rotation;
+        currentObject.transform.DOMove(_leftObjectPlacement.position, 0.5f);
+        currentObject.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
     }
 }
