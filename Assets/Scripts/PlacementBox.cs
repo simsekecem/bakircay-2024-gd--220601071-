@@ -62,7 +62,7 @@ public class PlacementBox : MonoBehaviour
 
         other.attachedRigidbody.isKinematic = true;
 
-        // Eþleþme baþlar baþlamaz Shuffle butonunu devre dýþý býrak
+
         if (shuffleButton != null)
         {
             shuffleButton.interactable = false;
@@ -98,7 +98,7 @@ public class PlacementBox : MonoBehaviour
             isLidOpen = true;
             isLidAnimating = false;
 
-            UpdateShuffleButtonInteractable(); // Shuffle durumu güncellenir
+            UpdateShuffleButtonInteractable(); 
         }
 
         Vector3 targetPos = (currentItem.transform.position + otherItem.transform.position) / 2f;
@@ -132,16 +132,16 @@ public class PlacementBox : MonoBehaviour
                 AudioManager.Instance.PlaySound(AudioManager.Instance.lidCloseSound);
 
                 lidAnimator.SetTrigger("LidClose");
-                yield return new WaitForSeconds(1f); // Kapak kapanma süresini bekle
+                yield return new WaitForSeconds(1f);
                 isLidOpen = false;
                 isLidAnimating = false;
 
-                UpdateShuffleButtonInteractable(); // Kapak kapandýktan sonra buton durumu güncelle
+                UpdateShuffleButtonInteractable(); 
             }
             currentObject = null;
             matchCoroutine = null;
 
-            // Eþleþme tamamlandýðýnda Shuffle butonunu tekrar aktif hale getir
+ 
             if (shuffleButton != null)
             {
                 shuffleButton.interactable = true;
@@ -172,7 +172,7 @@ public class PlacementBox : MonoBehaviour
         currentObject.transform.DOMove(_leftObjectPlacement.position, 0.5f);
         currentObject.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
 
-        UpdateShuffleButtonInteractable(); // Shuffle durumu güncellenir
+        UpdateShuffleButtonInteractable();
     }
 
     private void OnTriggerExit(Collider other)
@@ -189,7 +189,7 @@ public class PlacementBox : MonoBehaviour
                 autoMatchButton.interactable = true;
             }
 
-            UpdateShuffleButtonInteractable(); // Shuffle durumu güncellenir
+            UpdateShuffleButtonInteractable(); 
         }
     }
 
@@ -197,11 +197,11 @@ public class PlacementBox : MonoBehaviour
     {
         if (shuffleButton != null)
         {
-            shuffleButton.interactable = !isLidOpen && !isLidAnimating && matchCoroutine == null; // Eþleþme iþlemi yapýlmýyorsa aktif
+            shuffleButton.interactable = !isLidOpen && !isLidAnimating && matchCoroutine == null;
         }
     }
 
-    public void OnLidClosed() // Animator Event için metod
+    public void OnLidClosed() 
     {
         isLidOpen = false;
         isLidAnimating = false;
