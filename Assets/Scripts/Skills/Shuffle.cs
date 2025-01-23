@@ -6,13 +6,13 @@ using DG.Tweening;
 
 public class Shuffle : MonoBehaviour
 {
-    public GameObject lightSphere; 
+    public GameObject lightSphere;
     public Button skillButton;
-    public float rotationDuration = 3f; 
-    public float radius = 2f; 
-    public float shuffleDuration = 0.5f; 
+    public float rotationDuration = 3f;
+    public float radius = 2f;
+    public float shuffleDuration = 0.5f;
 
-    private GameObject[] moveableObjects; 
+    private GameObject[] moveableObjects;
 
     private void Start()
     {
@@ -31,7 +31,6 @@ public class Shuffle : MonoBehaviour
 
     public void ActivateSkill()
     {
-
         skillButton.interactable = false;
 
         moveableObjects = GameObject.FindGameObjectsWithTag("Moveable");
@@ -48,6 +47,8 @@ public class Shuffle : MonoBehaviour
 
     private IEnumerator ShuffleObjects()
     {
+        // Karýþtýrma sesi çal
+        AudioManager.Instance.PlaySound(AudioManager.Instance.shuffleSound);
 
         if (lightSphere != null)
         {
@@ -56,7 +57,6 @@ public class Shuffle : MonoBehaviour
         }
 
         float angleStep = 360f / moveableObjects.Length;
-
 
         for (int i = 0; i < moveableObjects.Length; i++)
         {
@@ -69,15 +69,12 @@ public class Shuffle : MonoBehaviour
                 Mathf.Sin(radians) * radius
             );
 
-
             moveableObjects[i].transform.DOMove(targetPosition, 1f).SetEase(Ease.InOutQuad);
         }
-
 
         yield return new WaitForSeconds(1f);
 
         float elapsedTime = 0f;
-
 
         while (elapsedTime < rotationDuration)
         {
@@ -89,7 +86,6 @@ public class Shuffle : MonoBehaviour
                 float angle = currentAngle + (angleStep * i);
                 float radians = angle * Mathf.Deg2Rad;
 
-
                 Vector3 newPosition = lightSphere.transform.position + new Vector3(
                     Mathf.Cos(radians) * radius,
                     0f,
@@ -99,9 +95,8 @@ public class Shuffle : MonoBehaviour
                 moveableObjects[i].transform.position = newPosition;
             }
 
-            yield return null; 
+            yield return null;
         }
-
 
         foreach (var obj in moveableObjects)
         {
@@ -111,11 +106,10 @@ public class Shuffle : MonoBehaviour
                 Random.Range(-radius, radius)
             );
 
-            obj.transform.DOMove(randomPosition, shuffleDuration).SetEase(Ease.InOutQuad); 
+            obj.transform.DOMove(randomPosition, shuffleDuration).SetEase(Ease.InOutQuad);
         }
 
         yield return new WaitForSeconds(shuffleDuration);
-
 
         if (lightSphere != null)
         {
@@ -128,4 +122,3 @@ public class Shuffle : MonoBehaviour
         Debug.Log("Skill button reactivated!");
     }
 }
-

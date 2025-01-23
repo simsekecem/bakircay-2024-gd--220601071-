@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-
 public class PlacementBox : MonoBehaviour
 {
     public GameObject currentObject;
@@ -91,6 +90,10 @@ public class PlacementBox : MonoBehaviour
         if (!isLidOpen && !isLidAnimating)
         {
             isLidAnimating = true;
+
+            // Kapak açýlma sesini çal
+            AudioManager.Instance.PlaySound(AudioManager.Instance.lidOpenSound);
+
             lidAnimator.SetTrigger("LidOpen");
             yield return new WaitForSeconds(1f); // Animasyonun süresi kadar bekleyin
             isLidOpen = true;
@@ -103,6 +106,8 @@ public class PlacementBox : MonoBehaviour
         otherItem.transform.DOMove(targetPos, 1f);
         yield return new WaitForSeconds(1f);
 
+        
+
         // Efekt oynat
         PlayBurnEffect(currentItem.gameObject);
         PlayBurnEffect(otherItem.gameObject);
@@ -113,6 +118,8 @@ public class PlacementBox : MonoBehaviour
         currentItem.transform.DOMove(targetPos, 1f);
         otherItem.transform.DOMove(targetPos, 1f);
         yield return new WaitForSeconds(1f);
+        // Eþleþme sesini çal
+        AudioManager.Instance.PlaySound(AudioManager.Instance.matchSound);
 
         // Nesneleri kapat ve skoru güncelle
         if (currentItem != null && otherItem != null)
@@ -127,6 +134,10 @@ public class PlacementBox : MonoBehaviour
             if (isLidOpen && !isLidAnimating)
             {
                 isLidAnimating = true;
+
+                // Kapak kapanma sesini çal
+                AudioManager.Instance.PlaySound(AudioManager.Instance.lidCloseSound);
+
                 lidAnimator.SetTrigger("LidClose");
                 yield return new WaitForSeconds(1f);
                 isLidOpen = false;
@@ -146,10 +157,7 @@ public class PlacementBox : MonoBehaviour
         {
             autoMatchButton.interactable = true;
         }
-
-        
     }
-
 
     private void PlayBurnEffect(GameObject targetObject)
     {
