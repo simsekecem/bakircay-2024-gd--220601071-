@@ -168,6 +168,21 @@ public class PlacementBox : MonoBehaviour
         }
     }
 
+    private void SetCurrentObject(Collider other)
+    {
+        other.attachedRigidbody.isKinematic = true;
+        currentObject = other.attachedRigidbody.gameObject;
+
+        currentObject.transform.DOMove(_leftObjectPlacement.position, 0.5f);
+        currentObject.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
+
+        // Shuffle butonunu devre dýþý býrak
+        if (shuffleButton != null)
+        {
+            shuffleButton.interactable = false;
+        }
+    }
+
     private void OnTriggerExit(Collider other)
     {
         if (other.attachedRigidbody == null || other.attachedRigidbody.CompareTag(objectTag) == false)
@@ -184,17 +199,8 @@ public class PlacementBox : MonoBehaviour
 
             if (shuffleButton != null)
             {
-                shuffleButton.interactable = true;
+                shuffleButton.interactable = true; // Shuffle butonunu tekrar aktif et
             }
         }
-    }
-
-    private void SetCurrentObject(Collider other)
-    {
-        other.attachedRigidbody.isKinematic = true;
-        currentObject = other.attachedRigidbody.gameObject;
-
-        currentObject.transform.DOMove(_leftObjectPlacement.position, 0.5f);
-        currentObject.transform.DORotateQuaternion(_leftObjectPlacement.rotation, 0.5f);
     }
 }
