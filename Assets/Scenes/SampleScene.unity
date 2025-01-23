@@ -1412,8 +1412,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98adeabc890ffa6489480f88473ea0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lidOpenSound: {fileID: 8300000, guid: 32d4b1811dda14a6cb9e059ee8ad17d2, type: 3}
-  lidCloseSound: {fileID: 8300000, guid: 32d4b1811dda14a6cb9e059ee8ad17d2, type: 3}
+  lidOpenSound: {fileID: 8300000, guid: 81652031b64c342cc8dbc59c138d77c5, type: 3}
+  lidCloseSound: {fileID: 8300000, guid: 81652031b64c342cc8dbc59c138d77c5, type: 3}
   matchSound: {fileID: 8300000, guid: 52320e590bf774734a288886eba557ba, type: 3}
   shuffleSound: {fileID: 8300000, guid: 8cc8b62211f9fa149b63f3032ed815b0, type: 3}
 --- !u!4 &549486690
