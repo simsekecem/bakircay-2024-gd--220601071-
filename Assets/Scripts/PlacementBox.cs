@@ -87,10 +87,15 @@ public class PlacementBox : MonoBehaviour
 
         Vector3 targetPos = (currentItem.transform.position + otherItem.transform.position) / 2f;
 
+       
+
         currentItem.transform.position = targetPos;
         otherItem.transform.position = targetPos;
+        PlayBurnEffect(currentItem.gameObject);
+        PlayBurnEffect(otherItem.gameObject);
 
-        yield return new WaitForSeconds(1f);
+        // Efektin bitmesini bekleyin
+        yield return new WaitForSeconds(3f);
 
         targetPos += Vector3.down * 2f;
         currentItem.transform.position = targetPos;
@@ -111,9 +116,13 @@ public class PlacementBox : MonoBehaviour
                 Debug.Log("Item data is null!");
             }
 
+            
+
+
             currentItem.gameObject.SetActive(false);
             otherItem.gameObject.SetActive(false);
 
+  
             // Lid Close animasyonu bir kez çalýþtýrýlýr
             if (isLidOpen && !isLidAnimating)
             {
@@ -123,10 +132,27 @@ public class PlacementBox : MonoBehaviour
                 isLidOpen = false;
                 isLidAnimating = false;
             }
+            currentObject = null;
+            matchCoroutine = null;
         }
 
-        currentObject = null;
-        matchCoroutine = null;
+
+        yield return new WaitForSeconds(5f);
+        if (autoMatchButton != null)
+        {
+            autoMatchButton.interactable = true;
+        }
+
+
+    }
+
+    private void PlayBurnEffect(GameObject targetObject)
+    {
+        ParticleSystem burnEffect = targetObject.GetComponentInChildren<ParticleSystem>();
+        if (burnEffect != null)
+        {
+            burnEffect.Play();
+        }
     }
 
     private void OnTriggerExit(Collider other)

@@ -8,23 +8,29 @@ public class AutoMatchManager : MonoBehaviour
     public Transform leftPlace; 
     public Transform rightPlace; 
     public List<GameObject> items = new List<GameObject>();
-    public Button autoMatchButton; 
+    public Button autoMatchButton;
+    public PlacementBox placementBox;
 
     private bool isMatchingInProgress = false; 
     private bool isButtonLocked = false; // Týklama kilidi
 
-    
+
     public void OnAutoMatchButtonClicked()
     {
-        
-        if (isButtonLocked) return;
-        isButtonLocked = true; 
+        // Eðer buton zaten kilitliyse veya PlacementBox doluysa iþlem yapma
+        if (isButtonLocked || (placementBox != null && placementBox.currentObject != null))
+        {
+            Debug.LogWarning("Button is locked or PlacementBox is not empty.");
+            return;
+        }
+
+        isButtonLocked = true;
 
         // Eðer eþleþme iþlemi zaten devam ediyorsa hiçbir þey yapma
         if (isMatchingInProgress)
         {
             Debug.LogWarning("Auto-match is already in progress.");
-            isButtonLocked = false; 
+            isButtonLocked = false;
             return;
         }
 
@@ -32,22 +38,20 @@ public class AutoMatchManager : MonoBehaviour
         GameObject[] matchedItems = GetMatchedItems();
         if (matchedItems == null || matchedItems.Length < 2)
         {
-            Debug.LogWarning("No matching items found."); // Hatalý bir durumda iþlemi baþlatma
-            isButtonLocked = false; 
+            Debug.LogWarning("No matching items found.");
+            isButtonLocked = false;
             return;
         }
 
-       
         isMatchingInProgress = true;
         autoMatchButton.interactable = false;
 
-
         PlaceItems(matchedItems);
 
-
         StartCoroutine(ResetAutoMatchButton());
-        StartCoroutine(UnlockButtonAfterDelay()); 
+        StartCoroutine(UnlockButtonAfterDelay());
     }
+
 
     private GameObject[] GetMatchedItems()
     {
